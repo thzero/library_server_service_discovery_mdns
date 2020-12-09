@@ -22,14 +22,16 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 			return;
 
 		if (this._serviceHttp) {
+			this._logger.info2(`init http DNS cleanup...`);
 			this._serviceHttp.advertise().then(() => {
-				this._logger.info2(`init http DNS published: ${this._nameHttp}`);
+				this._logger.info2(`init http DNS cleaned up: ${this._nameHttp}`);
 			});
 		}
 
 		if (this._serviceGrpc) {
+			this._logger.info2(`init grpc DNS cleanup...`);
 			this._serviceGrpc.advertise().then(() => {
-				this._logger.info2(`init grpc DNS published: ${this._nameGrpc}`);
+				this._logger.info2(`init grpc DNS cleaned up: ${this._nameGrpc}`);
 			});
 		}
 	}
@@ -52,7 +54,7 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 
 		this._serviceHttp = ciao.getResponder().createService(optsHttp);
 		this._serviceHttp.advertise().then(() => {
-			this._logger.info2(`init http DNS published`);
+			this._logger.info2(`init http DNS published: ${this._nameHttp}`);
 		});
 
 		if (opts.grpc) {
@@ -69,7 +71,7 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 
 			this._serviceGrpc = ciao.getResponder().createService(optsGrpc);
 			this._serviceGrpc.advertise().then(() => {
-				this._logger.info2(`init grpc DNS published`);
+				this._logger.info2(`init grpc DNS published: ${this._nameGrpc}`);
 			});
 		}
 
