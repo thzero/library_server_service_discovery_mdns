@@ -6,6 +6,9 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 	constructor() {
 		super();
 
+		this._nameGrpc = null;
+		this._nameHttp = null;
+
 		this._serviceGrpc = null;
 		this._serviceHttp = null;
 	}
@@ -18,17 +21,15 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 		if (!this._service)
 			return;
 
-		if (this._serviceHttp != null) {
+		if (this._serviceHttp) {
 			this._serviceHttp.advertise().then(() => {
-				// stuff you do when the service is published
-				this._logger.info2(`init http DNS published`);
+				this._logger.info2(`init http DNS published: ${this._nameHttp}`);
 			});
 		}
 
-		if (this._serviceGrpc != null) {
+		if (this._serviceGrpc) {
 			this._serviceGrpc.advertise().then(() => {
-				// stuff you do when the service is published
-				this._logger.info2(`init grpc DNS published`);
+				this._logger.info2(`init grpc DNS published: ${this._nameGrpc}`);
 			});
 		}
 	}
@@ -39,7 +40,7 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 
 		const namespace = opts.namespace ? optis.namespace : 'default';
 
-		const name = `${packageJson.name}${namespace}.local`;
+		this._nameHttp = `${packageJson.name}${namespace}.local`;
 
 		const optsHttp = {
 			name: name,
@@ -55,8 +56,10 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 		});
 
 		if (opts.grpc) {
+			this._nameGrpc = `{grpc}.name`;
+
 			const optsGrpc = {
-				name: `{grpc}.name`,
+				name: this._nameGrpc,
 				type: 'grpc',
 				port: opts.grpc.port
 			};
