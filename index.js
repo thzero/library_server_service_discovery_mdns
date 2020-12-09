@@ -42,7 +42,8 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 
 		const namespace = opts.namespace ? optis.namespace : 'default';
 
-		this._nameHttp = `${packageJson.name}${namespace}.local`;
+		const name = `${packageJson.name}.${namespace}.local`
+		this._nameHttp = name;
 
 		const optsHttp = {
 			name: this._nameHttp,
@@ -58,7 +59,7 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 		});
 
 		if (opts.grpc) {
-			this._nameGrpc = `{grpc}.name`;
+			this._nameGrpc = `grpc.${name}`;
 
 			const optsGrpc = {
 				name: this._nameGrpc,
