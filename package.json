@@ -1,0 +1,34 @@
+{
+  "name": "@thzero/library_server_service_discovery_mdns",
+  "version": "0.11.0",
+  "version_major": 0,
+  "version_minor": 11,
+  "version_patch": 0,
+  "version_date": "12/05/2020",
+  "description": "",
+  "author": "thZero",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thzero/library_server_service_discovery_mdns.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thzero/library_server_service_discovery_mdns/issues"
+  },
+  "engines": {
+    "node": ">=12.8.3"
+  },
+  "main": "index.js",
+  "scripts": {
+    "cli-update": "./node_modules/.bin/library-cli --updateversion --pi",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@homebridge/ciao": "^1.1.0",
+    "@thzero/library_common": "^0.11.0",
+    "@thzero/library_server": "^0.11.0",
+    "consul": "^0.39.0"
+  },
+  "devDependencies": {
+    "@thzero/library_cli": "^0.7.4"
+  }
+}
