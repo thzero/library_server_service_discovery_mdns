@@ -45,7 +45,7 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 		this._nameHttp = `${packageJson.name}${namespace}.local`;
 
 		const optsHttp = {
-			name: name,
+			name: this._nameHttp,
 			type: opts.secure ? 'https' : 'http',
 			port: opts.port
 		};
