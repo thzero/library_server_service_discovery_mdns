@@ -1,5 +1,7 @@
 import ciao from '@homebridge/ciao';
 
+import LibraryUtility from '@thzero/library_common/utility';
+
 import ResourceDiscoveryService from '@thzero/library_server/service/discovery/resources';
 
 class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
@@ -14,13 +16,10 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 	}
 
 	get allowsHeartbeat() {
-		return true;
+		return false;
 	}
 
 	async cleanup() {
-		if (!this._service)
-			return;
-
 		if (this._serviceHttp) {
 			this._logger.info2(`init http DNS cleanup...`);
 			this._serviceHttp.advertise().then(() => {
@@ -36,13 +35,24 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 		}
 	}
 
+	async _getService(correlationId, name) {
+		const namespace = opts.namespace ? optis.namespace : 'default';
+		if (LibraryUtility.isDev)
+			namespace = 'local';
+
+		name = `${name}.${namespace}`;
+		return name;
+	}
+
 	async _initialize(correlationId, opts) {
 		const packagePath = `${process.cwd()}/package.json`;
 		const packageJson = require(packagePath);
 
 		const namespace = opts.namespace ? optis.namespace : 'default';
+		if (LibraryUtility.isDev)
+			namespace = 'local';
 
-		const name = `${packageJson.name}.${namespace}.local`
+		const name = `${packageJson.name}.${namespace}`;
 		this._nameHttp = name;
 
 		const optsHttp = {
