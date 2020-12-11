@@ -2,9 +2,9 @@ import ciao from '@homebridge/ciao';
 
 import LibraryUtility from '@thzero/library_common/utility';
 
-import BaseService from '@thzero/library_server/service';
+import DiscoveryService from '@thzero/library_server/service/discovery';
 
-class MdnsService extends BaseService {
+class MdnsDiscoveryService extends DiscoveryService {
 	constructor() {
 		super();
 
@@ -25,14 +25,14 @@ class MdnsService extends BaseService {
 	// options { name, ttl, description }
 	async initialize(correlationId, opts) {
 		try {
-			this._enforceNotEmpty('MdnsService', 'initialize', opts, 'opts', correlationId);
-			this._enforceNotEmpty('MdnsService', 'initialize', opts.address, 'address', correlationId);
-			this._enforceNotNull('MdnsService', 'initialize', opts.port, 'port', correlationId);
+			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts, 'opts', correlationId);
+			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts.address, 'address', correlationId);
+			this._enforceNotNull('MdnsDiscoveryService', 'initialize', opts.port, 'port', correlationId);
 
 			return await this._initialize(correlationId, opts);
 		}
 		catch(err) {
-			return this._error('MdnsService', 'initialize', null, err, null, null, correlationId);
+			return this._error('MdnsDiscoveryService', 'initialize', null, err, null, null, correlationId);
 		}
 	}
 
@@ -40,21 +40,21 @@ class MdnsService extends BaseService {
 		const packagePath = `${process.cwd()}/package.json`;
 		const packageJson = require(packagePath);
 
-		const namespace = opts.namespace ? optis.namespace : 'default';
+		let namespace = opts.namespace ? optis.namespace : 'default';
 		if (LibraryUtility.isDev)
 			namespace = 'local';
 
 		this._name = `${packageJson.name}.${namespace}`;
 
-		const opts = {
+		const optsI = {
 			name: this._name,
 			type: opts.secure ? 'https' : 'http',
 			port: opts.port
 		};
 		if (opts.txt && Array.isArray(opts.txt))
-			opts.txt = opts.txt;
+			optsI.txt = opts.txt;
 
-		this._service = ciao.getResponder().createService(opts);
+		this._service = ciao.getResponder().createService(optsI);
 		this._service.advertise().then(() => {
 			this._logger.info2(`init http DNS published: ${this._name}`);
 		});
@@ -63,4 +63,4 @@ class MdnsService extends BaseService {
 	}
 }
 
-export default MdnsMdnsService;
+export default MdnsDiscoveryService;
