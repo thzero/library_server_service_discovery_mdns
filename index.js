@@ -2,46 +2,38 @@ import ciao from '@homebridge/ciao';
 
 import LibraryUtility from '@thzero/library_common/utility';
 
-import ResourceDiscoveryService from '@thzero/library_server/service/discovery/resources';
+import BaseService from '@thzero/library_server/service';
 
-class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
+class MdnsService extends BaseService {
 	constructor() {
 		super();
 
-		this._nameGrpc = null;
-		this._nameHttp = null;
+		this._name = null;
 
-		this._serviceGrpc = null;
-		this._serviceHttp = null;
-	}
-
-	get allowsHeartbeat() {
-		return false;
+		this._service = null;
 	}
 
 	async cleanup() {
-		if (this._serviceHttp) {
+		if (this._service) {
 			this._logger.info2(`init http DNS cleanup...`);
-			this._serviceHttp.advertise().then(() => {
-				this._logger.info2(`init http DNS cleaned up: ${this._nameHttp}`);
-			});
-		}
-
-		if (this._serviceGrpc) {
-			this._logger.info2(`init grpc DNS cleanup...`);
-			this._serviceGrpc.advertise().then(() => {
-				this._logger.info2(`init grpc DNS cleaned up: ${this._nameGrpc}`);
+			this._service.advertise().then(() => {
+				this._logger.info2(`init http DNS cleaned up: ${this._name}`);
 			});
 		}
 	}
 
-	async _getService(correlationId, name) {
-		const namespace = opts.namespace ? optis.namespace : 'default';
-		if (LibraryUtility.isDev)
-			namespace = 'local';
+	// options { name, ttl, description }
+	async initialize(correlationId, opts) {
+		try {
+			this._enforceNotEmpty('MdnsService', 'initialize', opts, 'opts', correlationId);
+			this._enforceNotEmpty('MdnsService', 'initialize', opts.address, 'address', correlationId);
+			this._enforceNotNull('MdnsService', 'initialize', opts.port, 'port', correlationId);
 
-		name = `${name}.${namespace}`;
-		return name;
+			return await this._initialize(correlationId, opts);
+		}
+		catch(err) {
+			return this._error('MdnsService', 'initialize', null, err, null, null, correlationId);
+		}
 	}
 
 	async _initialize(correlationId, opts) {
@@ -52,42 +44,23 @@ class MdnsResourceDiscoveryService extends ResourceDiscoveryService {
 		if (LibraryUtility.isDev)
 			namespace = 'local';
 
-		const name = `${packageJson.name}.${namespace}`;
-		this._nameHttp = name;
+		this._name = `${packageJson.name}.${namespace}`;
 
-		const optsHttp = {
-			name: this._nameHttp,
+		const opts = {
+			name: this._name,
 			type: opts.secure ? 'https' : 'http',
 			port: opts.port
 		};
 		if (opts.txt && Array.isArray(opts.txt))
-			optsHttp.txt = opts.txt;
+			opts.txt = opts.txt;
 
-		this._serviceHttp = ciao.getResponder().createService(optsHttp);
-		this._serviceHttp.advertise().then(() => {
-			this._logger.info2(`init http DNS published: ${this._nameHttp}`);
+		this._service = ciao.getResponder().createService(opts);
+		this._service.advertise().then(() => {
+			this._logger.info2(`init http DNS published: ${this._name}`);
 		});
-
-		if (opts.grpc) {
-			this._nameGrpc = `grpc.${name}`;
-
-			const optsGrpc = {
-				name: this._nameGrpc,
-				type: 'grpc',
-				port: opts.grpc.port
-			};
-
-			if (opts.grpc.txt && Array.isArray(opts.grpc.txt))
-				optsGrpc.txt = opts.grpc.txt;
-
-			this._serviceGrpc = ciao.getResponder().createService(optsGrpc);
-			this._serviceGrpc.advertise().then(() => {
-				this._logger.info2(`init grpc DNS published: ${this._nameGrpc}`);
-			});
-		}
 
 		return this._success(correlationId);
 	}
 }
 
-export default MdnsResourceDiscoveryService;
+export default MdnsMdnsService;
