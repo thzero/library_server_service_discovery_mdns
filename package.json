@@ -1,9 +1,9 @@
 {
   "name": "@thzero/library_server_service_mdns",
-  "version": "0.11.9",
+  "version": "0.12.0",
   "version_major": 0,
-  "version_minor": 11,
-  "version_patch": 9,
+  "version_minor": 12,
+  "version_patch": 0,
   "version_date": "12/11/2020",
   "description": "",
   "author": "thZero",
@@ -24,11 +24,11 @@
   },
   "dependencies": {
     "@homebridge/ciao": "^1.1.0",
-    "@thzero/library_common": "^0.11.0",
-    "@thzero/library_server": "^0.11.11",
+    "@thzero/library_common": "^0.12.0",
+    "@thzero/library_server": "^0.12.0",
     "consul": "^0.39.0"
   },
   "devDependencies": {
-    "@thzero/library_cli": "^0.7.4"
+    "@thzero/library_cli": "^0.12.0"
   }
 }
