@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
   "name": "@thzero/library_server_service_mdns",
   "version": "0.11.8",
+=======
+  "name": "@thzero/library_server_service_discovery_mdns",
+  "version": "0.11.7",
+>>>>>>> 45a35dc7e41c892b66a417a866a1f3a6cd39ed51
   "version_major": 0,
   "version_minor": 11,
   "version_patch": 8,
@@ -9,10 +14,10 @@
   "author": "thZero",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thzero/library_server_service_mdns.git"
+    "url": "git+https://github.com/thzero/library_server_service_discovery_mdns.git.git"
   },
   "bugs": {
-    "url": "https://github.com/thzero/library_server_service_mdns/issues"
+    "url": "https://github.com/thzero/library_server_service_discovery_mdns.git/issues"
   },
   "engines": {
     "node": ">=12.8.3"
@@ -25,7 +30,7 @@
   "dependencies": {
     "@homebridge/ciao": "^1.1.0",
     "@thzero/library_common": "^0.11.0",
-    "@thzero/library_server": "^0.11.0",
+    "@thzero/library_server": "^0.11.11",
     "consul": "^0.39.0"
   },
   "devDependencies": {
