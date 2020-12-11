@@ -40,21 +40,21 @@ class MdnsDiscoveryService extends DiscoveryService {
 		const packagePath = `${process.cwd()}/package.json`;
 		const packageJson = require(packagePath);
 
-		const namespace = opts.namespace ? optis.namespace : 'default';
+		let namespace = opts.namespace ? optis.namespace : 'default';
 		if (LibraryUtility.isDev)
 			namespace = 'local';
 
 		this._name = `${packageJson.name}.${namespace}`;
 
-		const opts = {
+		const optsI = {
 			name: this._name,
 			type: opts.secure ? 'https' : 'http',
 			port: opts.port
 		};
 		if (opts.txt && Array.isArray(opts.txt))
-			opts.txt = opts.txt;
+			optsI.txt = opts.txt;
 
-		this._service = ciao.getResponder().createService(opts);
+		this._service = ciao.getResponder().createService(optsI);
 		this._service.advertise().then(() => {
 			this._logger.info2(`init http DNS published: ${this._name}`);
 		});
@@ -63,4 +63,4 @@ class MdnsDiscoveryService extends DiscoveryService {
 	}
 }
 
-export default MdnsMdnsDiscoveryService;
+export default MdnsDiscoveryService;
