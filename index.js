@@ -41,8 +41,6 @@ class MdnsDiscoveryService extends DiscoveryService {
 		const packageJson = require(packagePath);
 
 		let namespace = opts.namespace ? optis.namespace : 'default';
-		if (LibraryUtility.isDev)
-			namespace = 'local';
 
 		this._name = `${packageJson.name}.${namespace}`;
 
