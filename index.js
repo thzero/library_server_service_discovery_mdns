@@ -29,6 +29,12 @@ class MdnsDiscoveryService extends DiscoveryService {
 			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts.address, 'address', correlationId);
 			this._enforceNotNull('MdnsDiscoveryService', 'initialize', opts.port, 'port', correlationId);
 
+			const local = this._config.get('dns.local', false);
+			if (!local) {
+				this._logger.warn('MdnsDiscoveryService', 'initialize', 'Did not initialize MDNS as not DNS is not specified as local.', null, correlationId);
+				return this.-this._success(correlationId);
+			}
+
 			return await this._initialize(correlationId, opts);
 		}
 		catch(err) {

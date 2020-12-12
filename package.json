@@ -1,9 +1,9 @@
 {
   "name": "@thzero/library_server_service_discovery_mdns",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "version_major": 0,
   "version_minor": 12,
-  "version_patch": 1,
+  "version_patch": 2,
   "version_date": "12/12/2020",
   "description": "",
   "author": "thZero",
