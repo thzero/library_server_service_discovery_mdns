@@ -1,7 +1,5 @@
 import ciao from '@homebridge/ciao';
 
-import LibraryUtility from '@thzero/library_common/utility';
-
 import DiscoveryService from '@thzero/library_server/service/discovery';
 
 class MdnsDiscoveryService extends DiscoveryService {
@@ -15,9 +13,9 @@ class MdnsDiscoveryService extends DiscoveryService {
 
 	async cleanup() {
 		if (this._service) {
-			this._logger.info2(`init http DNS cleanup...`);
+			this._logger.info2(`init DNS cleanup '${this._name}'...`);
 			this._service.advertise().then(() => {
-				this._logger.info2(`init http DNS cleaned up: ${this._name}`);
+				this._logger.info2(`init DNS cleaned up: ${this._name}`);
 			});
 		}
 	}
@@ -29,8 +27,7 @@ class MdnsDiscoveryService extends DiscoveryService {
 			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts.address, 'address', correlationId);
 			this._enforceNotNull('MdnsDiscoveryService', 'initialize', opts.port, 'port', correlationId);
 
-			const local = this._config.get('dns.local', false);
-			if (!local) {
+			if (!opts.dns && !opts.dns.local) {
 				this._logger.warn('MdnsDiscoveryService', 'initialize', 'Did not initialize MDNS as not DNS is not specified as local.', null, correlationId);
 				return this._success(correlationId);
 			}
@@ -46,9 +43,8 @@ class MdnsDiscoveryService extends DiscoveryService {
 		const packagePath = `${process.cwd()}/package.json`;
 		const packageJson = require(packagePath);
 
-		let namespace = opts.namespace ? optis.namespace : 'default';
-
-		this._name = `${packageJson.name}.${namespace}`;
+		const label = !String.isNullOrEmpty(opts.dns.label) ? opts.dns.label : packageJson;
+		this._name = `${label}.local`;
 
 		const optsI = {
 			name: this._name,
