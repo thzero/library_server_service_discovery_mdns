@@ -32,7 +32,7 @@ class MdnsDiscoveryService extends DiscoveryService {
 			const local = this._config.get('dns.local', false);
 			if (!local) {
 				this._logger.warn('MdnsDiscoveryService', 'initialize', 'Did not initialize MDNS as not DNS is not specified as local.', null, correlationId);
-				return this._this._success(correlationId);
+				return this._success(correlationId);
 			}
 
 			return await this._initialize(correlationId, opts);
