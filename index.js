@@ -12,12 +12,16 @@ class MdnsDiscoveryService extends DiscoveryService {
 	}
 
 	async cleanup() {
-		if (this._service) {
-			this._logger.info2(`init DNS cleanup '${this._name}'...`);
-			this._service.advertise().then(() => {
-				this._logger.info2(`init DNS cleaned up: ${this._name}`);
-			});
-		}
+		if (!this._service)
+			return;
+
+		this._logger.info2(`init DNS cleanup '${this._name}'...`);
+		this._service.end().then(() => {
+			this._logger.info2(`init DNS cleaned up: ${this._name}`);
+			this._service.destroy();
+		}).catch(() => {
+			this._service.destroy();
+		});
 	}
 
 	// options { name, ttl, description }
@@ -57,6 +61,8 @@ class MdnsDiscoveryService extends DiscoveryService {
 		this._service = ciao.getResponder().createService(optsI);
 		this._service.advertise().then(() => {
 			this._logger.info2(`init http DNS published: ${this._name}`);
+		}).catch(() => {
+			this._service.destroy();
 		});
 
 		return this._success(correlationId);
