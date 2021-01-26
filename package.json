@@ -7,6 +7,7 @@
   "version_date": "01/19/2021",
   "description": "",
   "author": "thZero",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thzero/library_server_service_discovery_mdns.git"
