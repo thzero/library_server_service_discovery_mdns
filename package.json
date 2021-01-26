@@ -9,7 +9,7 @@
   "author": "thZero",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thzero/library_server_service_discovery_mdns.git.git"
+    "url": "git+https://github.com/thzero/library_server_service_discovery_mdns.git"
   },
   "bugs": {
     "url": "https://github.com/thzero/library_server_service_discovery_mdns.git/issues"
