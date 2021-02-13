@@ -1,0 +1,119 @@
+name: Build CI
+
+on:
+    repository_dispatch:
+     # types: [ npm, version ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    if: github.actor == github.event.repository.owner.login
+
+    strategy:
+      matrix:
+        #node-version: [8.x, 10.x, 12.x]
+        node-version: [13.x]
+
+    steps:
+    - name: Event Input
+      run: |
+        echo event-type: ${{ github.event.action }}
+        echo action: ${{ github.event.client_payload.action }}
+        echo label: ${{ github.event.client_payload.label }}
+        echo library: ${{ github.event.client_payload.library }}
+    - uses: actions/checkout@v2
+      with:
+        ref: dev
+    - name: Package Output
+      run: |
+        cat package.json
+    - name: Initialize Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: 'https://registry.npmjs.org'
+    - name: NCU Upgrade Check
+      if: github.event.action == 'npm'
+      id: ncu-upgrade
+      uses: thzero/ncu-upgrade@v0.13-beta
+    - name: NCU Updated Check Output
+      if: github.event.action == 'npm'
+      run: |
+        echo upgraded: ${{ steps.ncu-upgrade.outputs.upgraded }}
+        echo npm_and_upgrade? ${{ (github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded) }}
+    - name: Output
+      run: |
+        echo upgraded: ${{ steps.ncu-upgrade.outputs.upgraded }}
+        echo action: ${{ github.event.action }}
+        echo action_is_npm? ${{ (github.event.action == 'npm') }}
+        echo npm_and_upgrade? ${{ (github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) }}
+        echo action_is_version? ${{ (github.event.action == 'version') }}
+        echo upgrade? ${{ ((github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version') }}
+    - name: Node Dependencies
+      if: ((github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
+      run: |
+        npm install --no-package-lock
+    - name: Update Package Version
+      if: ((github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
+      run: |
+        npm run cli-update -- --silent
+    - name: Git Check
+      id: git-changes
+      if: success()
+      uses: UnicornGlobal/has-changes-action@v1.0.11
+    - name: Git Check Output
+      run: |
+        echo changed? ${{ steps.git-changes.outputs.changed }}
+        echo npm commit? ${{ github.event.action == 'npm' && steps.git-changes.outputs.changed == 1 }}
+        echo !npm commit? ${{ github.event.action != 'npm' && steps.git-changes.outputs.changed == 1 && github.event.client_payload.label != '' }}
+    - name: Git Commit NPM
+      if: github.event.action == 'npm' && steps.git-changes.outputs.changed == 1
+      run: |
+        git config --global user.name '${{ github.repository_owner }}'
+        git config --global user.email '${{ github.repository_owner }}@users.noreply.github.com'
+        git add .
+        git commit -m "npm updates"
+        git push
+    - name: Git Commit Version
+      if: github.event.action == 'version' && steps.git-changes.outputs.changed == 1 && github.event.client_payload.label != ''
+      run: |
+        git config --global user.name '${{ github.repository_owner }}'
+        git config --global user.email '${{ github.repository_owner }}@users.noreply.github.com'
+        git add .
+        git commit -m "version updates"
+        git push
+    - name: Requires Pull Request?
+      run: |
+        echo changed? ${{ steps.git-changes.outputs.changed }}
+    - name: Pull Request
+      id: pull-request
+      if: steps.git-changes.outputs.changed == 1 && success()
+      uses: repo-sync/pull-request@v2
+      with:
+        source_branch: dev
+        destination_branch: master
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull Request Output
+      if: steps.git-changes.outputs.changed == 1 && success()
+      run: |
+        echo ${{ steps.pull-request.outputs.pr_url }}
+        echo ${{ steps.pull-request.outputs.pr_number }}
+    - name: Merge pull request
+      if: steps.git-changes.outputs.changed == 1 && steps.pull-request.outputs.pr_number > 0 && success()
+      uses: sudo-bot/action-pull-request-merge@v1.1.1
+      with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.pull-request.outputs.pr_number }}
+    - run: npm publish --access public
+      if: steps.git-changes.outputs.changed == 1 && success()
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    - name: Repository Dispatch - Service Service Discovery Lightweight Proto
+      if: github.event.action == 'build_all'
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        repository: thzero/library_server_service_discovery_resources_lightweight_proto
+        event-type: ${{ github.event.action }}
+        client-payload: '{ "action": "${{ github.event.client_payload.action }}", "label": "${{ github.event.client_payload.label }}" }'
