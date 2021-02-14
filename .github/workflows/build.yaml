@@ -34,28 +34,25 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
     - name: NCU Upgrade Check
-      if: github.event.action == 'npm'
+      if: github.event.client_payload.action == 'npm'
       id: ncu-upgrade
-      uses: thzero/ncu-upgrade@v0.13-beta
+      uses: thzero/ncu-upgrade@v0.23-beta
     - name: NCU Updated Check Output
-      if: github.event.action == 'npm'
       run: |
         echo upgraded: ${{ steps.ncu-upgrade.outputs.upgraded }}
-        echo npm_and_upgrade? ${{ (github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded) }}
-    - name: Output
-      run: |
-        echo upgraded: ${{ steps.ncu-upgrade.outputs.upgraded }}
+        echo upgrades: ${{ steps.ncu-upgrade.outputs.upgrades }}
         echo action: ${{ github.event.action }}
-        echo action_is_npm? ${{ (github.event.action == 'npm') }}
-        echo npm_and_upgrade? ${{ (github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) }}
+        echo action_is_npm? ${{ (github.event.client_payload.action == 'npm') }}
+        echo upgrade? ${{ (steps.ncu-upgrade.outputs.upgraded == true) }}
+        echo npm_and_upgrade? ${{ (github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) }}
         echo action_is_version? ${{ (github.event.action == 'version') }}
-        echo upgrade? ${{ ((github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version') }}
+        echo upgrade? ${{ ((github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version') }}
     - name: Node Dependencies
-      if: ((github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
+      if: ((github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
       run: |
         npm install --no-package-lock
     - name: Update Package Version
-      if: ((github.event.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
+      if: ((github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
       run: |
         npm run cli-update -- --silent
     - name: Git Check
@@ -65,10 +62,10 @@ jobs:
     - name: Git Check Output
       run: |
         echo changed? ${{ steps.git-changes.outputs.changed }}
-        echo npm commit? ${{ github.event.action == 'npm' && steps.git-changes.outputs.changed == 1 }}
-        echo !npm commit? ${{ github.event.action != 'npm' && steps.git-changes.outputs.changed == 1 && github.event.client_payload.label != '' }}
+        echo npm commit? ${{ github.event.client_payload.action == 'npm' && steps.git-changes.outputs.changed == true }}
+        echo !npm commit? ${{ github.event.action != 'npm' && steps.git-changes.outputs.changed == true && github.event.client_payload.label != '' }}
     - name: Git Commit NPM
-      if: github.event.action == 'npm' && steps.git-changes.outputs.changed == 1
+      if: github.event.client_payload.action == 'npm' && steps.git-changes.outputs.changed == true
       run: |
         git config --global user.name '${{ github.repository_owner }}'
         git config --global user.email '${{ github.repository_owner }}@users.noreply.github.com'
@@ -76,7 +73,7 @@ jobs:
         git commit -m "npm updates"
         git push
     - name: Git Commit Version
-      if: github.event.action == 'version' && steps.git-changes.outputs.changed == 1 && github.event.client_payload.label != ''
+      if: github.event.action == 'version' && steps.git-changes.outputs.changed == true && github.event.client_payload.label != ''
       run: |
         git config --global user.name '${{ github.repository_owner }}'
         git config --global user.email '${{ github.repository_owner }}@users.noreply.github.com'
@@ -88,19 +85,19 @@ jobs:
         echo changed? ${{ steps.git-changes.outputs.changed }}
     - name: Pull Request
       id: pull-request
-      if: steps.git-changes.outputs.changed == 1 && success()
+      if: steps.git-changes.outputs.changed == true && success()
       uses: repo-sync/pull-request@v2
       with:
         source_branch: dev
         destination_branch: master
         github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Pull Request Output
-      if: steps.git-changes.outputs.changed == 1 && success()
+      if: steps.git-changes.outputs.changed == true && success()
       run: |
         echo ${{ steps.pull-request.outputs.pr_url }}
         echo ${{ steps.pull-request.outputs.pr_number }}
     - name: Merge pull request
-      if: steps.git-changes.outputs.changed == 1 && steps.pull-request.outputs.pr_number > 0 && success()
+      if: steps.git-changes.outputs.changed == true && steps.pull-request.outputs.pr_number > 0 && success()
       uses: sudo-bot/action-pull-request-merge@v1.1.1
       with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
