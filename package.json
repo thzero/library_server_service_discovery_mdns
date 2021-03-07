@@ -1,10 +1,10 @@
 {
   "name": "@thzero/library_server_service_discovery_mdns",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "version_major": 0,
   "version_minor": 13,
-  "version_patch": 6,
-  "version_date": "01/28/2021",
+  "version_patch": 7,
+  "version_date": "03/07/2021",
   "description": "",
   "author": "thZero",
   "license": "MIT",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@homebridge/ciao": "^1.1.2",
-    "consul": "^0.39.0"
+    "consul": "^0.40.0"
   },
   "devDependencies": {
     "@thzero/library_cli": "^0.13"
