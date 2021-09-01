@@ -21,6 +21,7 @@
   "main": "index.js",
   "scripts": {
     "cli-update": "./node_modules/.bin/library-cli --updateversion --pi",
+    "cli-update-w": ".\\node_modules\\.bin\\library-cli --updateversion --pi",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -28,7 +29,7 @@
     "consul": "^0.40.0"
   },
   "devDependencies": {
-    "@thzero/library_cli": "^0.13"
+    "@thzero/library_cli": "^0.13.17"
   },
   "peerDependencies": {
     "@thzero/library_common": "^0.13",
