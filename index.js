@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import ciao from '@homebridge/ciao';
 
 import DiscoveryService from '@thzero/library_server/service/discovery';
@@ -44,8 +47,14 @@ class MdnsDiscoveryService extends DiscoveryService {
 	}
 
 	async _initialize(correlationId, opts) {
-		const packagePath = `${process.cwd()}/package.json`;
-		const packageJson = require(packagePath);
+		const packagePath = path.join(process.cwd(), 'package.json');
+		const file = fs.readFileSync(packagePath, 'utf8');
+		if (String.isNullOrEmpty(file))
+			throw Error('Invalid package.json file for mdns; expected in the <app root> folder.');
+
+		const packageJson = JSON.parse(file);
+		if (!packageJson)
+			throw Error('Invalid package.json file for mdns.');
 
 		const label = !String.isNullOrEmpty(opts.dns.label) ? opts.dns.label : packageJson;
 		this._name = `${label}.local`;
