@@ -3,11 +3,14 @@ node_modules
 node_modules2
 /dist
 
+.npmrc
+
 # local env files
 .env.local
 .env.*.local
 
 # Log files
+debug.log*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
