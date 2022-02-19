@@ -1,4 +1,13 @@
-publish.bat
+ncupd.bat
+ncupd.sh
 push.bat
+push.sh
+pushnpm.bat
+pushnpm.sh
+pushversion.bat
+pushversion.sh
+version.bat
+version.sh
 .npmignore
 .github
+.npmrc
