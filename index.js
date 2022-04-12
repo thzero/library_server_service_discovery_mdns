@@ -34,7 +34,7 @@ class MdnsDiscoveryService extends DiscoveryService {
 			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts.address, 'address', correlationId);
 			this._enforceNotNull('MdnsDiscoveryService', 'initialize', opts.port, 'port', correlationId);
 
-			if (!opts.dns && !opts.dns.local) {
+			if (!opts.dns && (opts.dns && !opts.dns.local)) {
 				this._logger.warn('MdnsDiscoveryService', 'initialize', 'Did not initialize MDNS as not DNS is not specified as local.', null, correlationId);
 				return this._success(correlationId);
 			}
@@ -56,7 +56,7 @@ class MdnsDiscoveryService extends DiscoveryService {
 		if (!packageJson)
 			throw Error('Invalid package.json file for mdns.');
 
-		const label = !String.isNullOrEmpty(opts.dns.label) ? opts.dns.label : packageJson;
+		const label = !String.isNullOrEmpty(opts.dns && opts.dns.label) ? opts.dns.label : packageJson;
 		this._name = `${label}.local`;
 
 		const optsI = {
