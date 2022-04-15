@@ -47,16 +47,30 @@ class MdnsDiscoveryService extends DiscoveryService {
 	}
 
 	async _initialize(correlationId, opts) {
-		const packagePath = path.join(process.cwd(), 'package.json');
-		const file = fs.readFileSync(packagePath, 'utf8');
-		if (String.isNullOrEmpty(file))
-			throw Error('Invalid package.json file for mdns; expected in the <app root> folder.');
+		let label = !String.isNullOrEmpty(opts.dns && opts.dns.label) ? opts.dns.label : null;
+		if (String.isNullOrEmpty(label)) {
+			this._logger.info2(`init http DNS package json fallback...`);
+			const packagePath = path.join(process.cwd(), 'package.json');
+			const file = fs.readFileSync(packagePath, 'utf8');
+			if (String.isNullOrEmpty(file))
+				throw Error('Invalid package.json file for mdns; expected in the <app root> folder.');
 
-		const packageJson = JSON.parse(file);
-		if (!packageJson)
-			throw Error('Invalid package.json file for mdns.');
+			const packageJson = JSON.parse(file);
+			if (!packageJson)
+				throw Error('Invalid package.json file for mdns.');
 
-		const label = !String.isNullOrEmpty(opts.dns && opts.dns.label) ? opts.dns.label : packageJson;
+			let packageName = packageJson.name;
+			if (String.isNullOrEmpty(packageName))
+				throw Error('Invalid name in the package.json file for mdns.');
+			let splitName = packageName.split('/');
+			if (!splitName)
+				throw Error('Invalid name in the package.json file for mdns.');
+			if (splitName.length === 0)
+				throw Error('Invalid name in the package.json file for mdns.');
+			label = splitName[splitName.length > 1 ? 1 : 0];
+		}
+		if (String.isNullOrEmpty(label))
+			throw Error('Invalid label for mdns.');
 		this._name = `${label}.local`;
 
 		const optsI = {
