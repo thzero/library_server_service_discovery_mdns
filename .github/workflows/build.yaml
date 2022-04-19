@@ -48,6 +48,10 @@ jobs:
         echo npm_and_upgrade? ${{ (github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) }}
         echo action_is_version? ${{ (github.event.action == 'version') }}
         echo upgrade? ${{ ((github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version') }}
+    - name: Node Dependencies for CLI
+      if: ((github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
+      run: |
+        npm install -g @thzero/library_cli
     - name: Node Dependencies
       if: ((github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
       run: |
@@ -55,7 +59,8 @@ jobs:
     - name: Update Package Version
       if: ((github.event.client_payload.action == 'npm' && steps.ncu-upgrade.outputs.upgraded == true) || github.event.action == 'version')
       run: |
-        npm run cli-update -- --silent
+        # npm run cli-update -- --silent
+        library-cli --updateversion --pi --silent
     - name: Git Check
       id: git-changes
       if: success()
@@ -119,11 +124,11 @@ jobs:
       if: steps.git-changes.outputs.changed == 1 && success()
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    - name: Repository Dispatch - Service Service Discovery Lightweight Proto
+    - name: Repository Dispatch - Build Base
       if: github.event.action == 'build_all'
       uses: peter-evans/repository-dispatch@v1
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
-        repository: thzero/library_server_service_discovery_resources_lightweight_proto
-        event-type: ${{ github.event.action }}
+        repository: thzero/library_build
+        event-type: 'build_all_base'
         client-payload: '{ "action": "${{ github.event.client_payload.action }}", "label": "${{ github.event.client_payload.label }}" }'
