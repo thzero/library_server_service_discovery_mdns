@@ -1,1 +1,1 @@
-@npm run cli-update-w
+library-cli --updateversion --pi

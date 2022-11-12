@@ -1,2 +1,2 @@
-call npm run cli-update -- --silent
+call library-cli --updateversion --pi --silent
 call push %1
