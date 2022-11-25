@@ -19,14 +19,13 @@ jobs:
 
     strategy:
       matrix:
-        #node-version: [8.x, 10.x, 12.x]
-        node-version: [18.x]
+        node-version: [16.x]
 
     steps:
     - name: Input
       run: |
         echo label: ${{ github.event.inputs.label }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         ref: dev
     - name: Node Dependencies for CLI
@@ -39,7 +38,7 @@ jobs:
       run: |
         cat package.json
     - name: Initialize Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
@@ -50,7 +49,7 @@ jobs:
     - name: Check for uncommitted changes
       id: git-changes
       if: success()
-      uses: thzero/check-uncommitted-changes-action@v1.0.3
+      uses: thzero/check-uncommitted-changes-action@v1.0.4
     - name: Git Check Output
       run: |
         echo changed? ${{ steps.git-changes.outputs.changed }}
@@ -66,7 +65,7 @@ jobs:
     - name: Pull Request
       id: pull-request
       if: steps.git-changes.outputs.changed == 1 && success()
-      uses: repo-sync/pull-request@v2
+      uses: repo-sync/pull-request@v2.9
       with:
         source_branch: dev
         destination_branch: master
@@ -78,7 +77,7 @@ jobs:
         echo ${{ steps.pull-request.outputs.pr_number }}
     - name: Merge pull request
       if: steps.git-changes.outputs.changed == 1 && steps.pull-request.outputs.pr_number > 0 && success()
-      uses: sudo-bot/action-pull-request-merge@v1.1.1
+      uses: sudo-bot/action-pull-request-merge@v1.2.0
       with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           number: ${{ steps.pull-request.outputs.pr_number }}

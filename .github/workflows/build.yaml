@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         #node-version: [8.x, 10.x, 12.x]
-        node-version: [18.x]
+        node-version: [13.x]
 
     steps:
     - name: Event Input
@@ -78,7 +78,7 @@ jobs:
         echo $diff_check
         echo ${#diff_check}
         diff_check_length=${#diff_check}
-        echo ::set-output name=diff_check_length::$diff_check_length
+        echo "diff_check_length=$diff_check_length" >> $GITHUB_OUTPUT
     - name: Git Diff Check Output
       run: |
         echo ${{ steps.git-diff-changes.outputs.diff_check_length }}- name: Git Commit NPM
