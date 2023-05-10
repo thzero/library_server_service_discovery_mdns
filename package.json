@@ -1,11 +1,11 @@
 {
   "name": "@thzero/library_server_service_discovery_mdns",
   "type": "module",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "version_major": 0,
   "version_minor": 17,
-  "version_patch": 1,
-  "version_date": "02/02/2023",
+  "version_patch": 2,
+  "version_date": "05/10/2023",
   "description": "",
   "author": "thZero",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@homebridge/ciao": "^1.1.5",
+    "@homebridge/ciao": "^1.1.7",
     "consul": "^1.2.0"
   },
   "peerDependencies": {
