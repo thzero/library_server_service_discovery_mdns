@@ -3,7 +3,7 @@ import path from 'path';
 
 import ciao from '@homebridge/ciao';
 
-import DiscoveryService from '@thzero/library_server/service/discovery';
+import DiscoveryService from '@thzero/library_server/service/discovery/index.js';
 
 class MdnsDiscoveryService extends DiscoveryService {
 	constructor() {
@@ -31,7 +31,6 @@ class MdnsDiscoveryService extends DiscoveryService {
 	async initialize(correlationId, opts) {
 		try {
 			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts, 'opts', correlationId);
-			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts.address, 'address', correlationId);
 			this._enforceNotNull('MdnsDiscoveryService', 'initialize', opts.port, 'port', correlationId);
 
 			if (!opts.dns && (opts.dns && !opts.dns.local)) {
