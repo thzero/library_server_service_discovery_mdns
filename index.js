@@ -72,10 +72,15 @@ class MdnsDiscoveryService extends DiscoveryService {
 			throw Error('Invalid label for mdns.');
 		this._name = `${label}.local`;
 
+		let restrictedAddresses = null;
+		if (opts.address && opts.address !== '0.0.0.0')
+			restrictedAddresses = [ opts.address ];
+
 		const optsI = {
 			name: this._name,
 			type: opts.secure ? 'https' : 'http',
-			port: opts.port
+			port: opts.port,
+			restrictedAddresses: restrictedAddresses
 		};
 		if (opts.txt && Array.isArray(opts.txt))
 			optsI.txt = opts.txt;
