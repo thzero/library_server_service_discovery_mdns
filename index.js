@@ -28,24 +28,24 @@ class MdnsDiscoveryService extends DiscoveryService {
 	}
 
 	// options { name, ttl, description }
-	async initialize(correlationId, opts) {
+	async initializeDiscovery(opts) {
 		try {
-			this._enforceNotEmpty('MdnsDiscoveryService', 'initialize', opts, 'opts', correlationId);
-			this._enforceNotNull('MdnsDiscoveryService', 'initialize', opts.port, 'port', correlationId);
+			this._enforceNotEmpty('MdnsDiscoveryService', 'initializeDiscovery', opts, 'opts', null);
+			this._enforceNotNull('MdnsDiscoveryService', 'initializeDiscovery', opts.port, 'port', null);
 
 			if (!opts.dns && (opts.dns && !opts.dns.local)) {
-				this._logger.warn('MdnsDiscoveryService', 'initialize', 'Did not initialize MDNS as not DNS is not specified as local.', null, correlationId);
-				return this._success(correlationId);
+				this._logger.warn('MdnsDiscoveryService', 'initializeDiscovery', 'Did not initialize MDNS as not DNS is not specified as local.', null, null);
+				return this._success();
 			}
 
-			return await this._initialize(correlationId, opts);
+			return await this._initializeDiscovery(opts);
 		}
 		catch(err) {
-			return this._error('MdnsDiscoveryService', 'initialize', null, err, null, null, correlationId);
+			return this._error('MdnsDiscoveryService', 'initializeDiscovery', null, err, null, null, correlationId);
 		}
 	}
 
-	async _initialize(correlationId, opts) {
+	async _initializeDiscovery(opts) {
 		let label = !String.isNullOrEmpty(opts.dns && opts.dns.label) ? opts.dns.label : null;
 		if (String.isNullOrEmpty(label)) {
 			this._logger.info2(`init http DNS package json fallback...`);
@@ -92,7 +92,7 @@ class MdnsDiscoveryService extends DiscoveryService {
 			this._service.destroy();
 		});
 
-		return this._success(correlationId);
+		return this._success();
 	}
 }
 
