@@ -1,13 +1,15 @@
 {
   "name": "@thzero/library_server_service_discovery_mdns",
   "type": "module",
-  "version": "0.18.9",
+  "version": "0.18.10",
   "version_major": 0,
   "version_minor": 18,
-  "version_patch": 9,
-  "version_date": "07/27/2025",
+  "version_patch": 10,
+  "version_date": "02/07/2026",
   "description": "",
   "author": "thZero",
+  "author_url": "https://www.thzero.com",
+  "copyright": "2020-2026",
   "license": "MIT",
   "repository": {
     "type": "git",
