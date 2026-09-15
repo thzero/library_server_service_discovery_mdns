@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         #node-version: [8.x, 10.x, 12.x]
-        node-version: [13.x]
+        node-version: [22.x]
 
     steps:
     - name: Event Input
@@ -22,7 +22,7 @@ jobs:
         echo action: ${{ github.event.client_payload.action }}
         echo label: ${{ github.event.client_payload.label }}
         echo library: ${{ github.event.client_payload.library }}
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
       with:
         ref: dev
         fetch-depth: 0
@@ -30,14 +30,14 @@ jobs:
       run: |
         cat package.json
     - name: Initialize Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
     - name: NCU Upgrade Check
       if: github.event.client_payload.action == 'npm'
       id: ncu-upgrade
-      uses: thzero/ncu-upgrade@v0.23-beta
+      uses: thzero/ncu-upgrade@v0.24-beta
     - name: NCU Updated Check Output
       run: |
         echo upgraded: ${{ steps.ncu-upgrade.outputs.upgraded }}
@@ -104,7 +104,7 @@ jobs:
     - name: Pull Request
       id: pull-request
       if: steps.git-changes.outputs.changed == true && success()
-      uses: repo-sync/pull-request@v2
+      uses: repo-sync/pull-request@v2.12.1
       with:
         source_branch: dev
         destination_branch: master
@@ -116,7 +116,7 @@ jobs:
         echo ${{ steps.pull-request.outputs.pr_number }}
     - name: Merge pull request
       if: steps.git-changes.outputs.changed == true && steps.pull-request.outputs.pr_number > 0 && success()
-      uses: sudo-bot/action-pull-request-merge@v1.1.1
+      uses: sudo-bot/action-pull-request-merge@v2
       with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           number: ${{ steps.pull-request.outputs.pr_number }}
@@ -126,7 +126,7 @@ jobs:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: Repository Dispatch - Build Base
       if: github.event.action == 'build_all'
-      uses: peter-evans/repository-dispatch@v1
+      uses: peter-evans/repository-dispatch@v4
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
         repository: thzero/library_build
