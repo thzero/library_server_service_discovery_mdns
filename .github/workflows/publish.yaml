@@ -19,15 +19,20 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [22.x]
 
     steps:
     - name: Input
       run: |
         echo label: ${{ github.event.inputs.label }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
       with:
         ref: dev
+    - name: Initialize Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v7
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: 'https://registry.npmjs.org'
     - name: Node Dependencies for CLI
       run: |
         npm install -g @thzero/library_cli
@@ -37,11 +42,6 @@ jobs:
     - name: Package Output
       run: |
         cat package.json
-    - name: Initialize Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        registry-url: 'https://registry.npmjs.org'
     - name: Update Package Version
       run: |
         # npm run cli-update -- --silent
@@ -49,7 +49,7 @@ jobs:
     - name: Check for uncommitted changes
       id: git-changes
       if: success()
-      uses: thzero/check-uncommitted-changes-action@v1.0.4
+      uses: thzero/check-uncommitted-changes-action@v1.0.5
     - name: Git Check Output
       run: |
         echo changed? ${{ steps.git-changes.outputs.changed }}
@@ -65,7 +65,7 @@ jobs:
     - name: Pull Request
       id: pull-request
       if: steps.git-changes.outputs.changed == 1 && success()
-      uses: repo-sync/pull-request@v2.9
+      uses: repo-sync/pull-request@v2.12.1
       with:
         source_branch: dev
         destination_branch: master
@@ -77,7 +77,7 @@ jobs:
         echo ${{ steps.pull-request.outputs.pr_number }}
     - name: Merge pull request
       if: steps.git-changes.outputs.changed == 1 && steps.pull-request.outputs.pr_number > 0 && success()
-      uses: sudo-bot/action-pull-request-merge@v1.2.0
+      uses: sudo-bot/action-pull-request-merge@v2
       with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           number: ${{ steps.pull-request.outputs.pr_number }}
